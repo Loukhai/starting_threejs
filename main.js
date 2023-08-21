@@ -1,9 +1,12 @@
-// import three js
 import * as THREE from "three";
-// check support
-import WebGL from "three/addons/capabilities/WebGL.js";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
-// Init scene & camera and renderer (canvas)
+// init renderer
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+// init scene
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
   75,
@@ -11,49 +14,29 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
-const renderer = new THREE.WebGLRenderer();
-// { antialias: true }
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
 
-// build the cube
-const geometry = new THREE.BoxGeometry(3, 5, 2);
-const material = new THREE.MeshBasicMaterial({
-  color: 0xffffff,
-});
-const cube = new THREE.Mesh(geometry, material);
-camera.position.z = 10;
-// the rendering function is animate
+const axesHelper = new THREE.AxesHelper(5);
+scene.add(axesHelper);
 
-// adding the border
-const borderMaterial = new THREE.MeshBasicMaterial({ color: 0xff0062 });
-const borderMesh = new THREE.Mesh(geometry, borderMaterial);
-borderMesh.scale.set(1.1, 1.1, 1.1);
+camera.position.set(0, 2, 7);
 
-// add the mesh to scene
-scene.add(cube);
-scene.add(borderMesh);
+// orbit instance
+const orbit = new OrbitControls(camera, renderer.domElement);
+orbit.update();
 
-// render the scene & camera w/ animation loop or render method
-function animate() {
-  // loop
-  requestAnimationFrame(animate);
+// box
+const boxGeometry = new THREE.BoxGeometry();
+const boxMaterial = new THREE.MeshBasicMaterial({ color: "green" });
+const box = new THREE.Mesh(boxGeometry, boxMaterial);
+scene.add(box);
 
-  // animate the cube
-  cube.rotation.x += 0.009;
-  cube.rotation.y += 0.01;
-  borderMesh.rotation.x += 0.009;
-  borderMesh.rotation.y += 0.01;
+function animation() {
+  requestAnimationFrame(animation);
 
-  // rendering in html
+  box.rotation.x += 0.01;
+  box.rotation.y += 0.01;
+
+  // link the scene and camera
   renderer.render(scene, camera);
 }
-
-// support WebGL to start animation
-if (WebGL.isWebGLAvailable()) {
-  // Initiate function or other initializations here
-  animate();
-} else {
-  const warning = WebGL.getWebGLErrorMessage();
-  document.getElementById("container").appendChild(warning);
-}
+animation();
